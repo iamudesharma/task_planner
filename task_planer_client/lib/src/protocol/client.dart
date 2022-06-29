@@ -9,6 +9,8 @@ import 'dart:typed_data' as typed_data;
 import 'package:serverpod_client/serverpod_client.dart';
 import 'protocol.dart';
 
+import 'package:serverpod_auth_client/module.dart' as serverpod_auth;
+
 class _EndpointExample extends EndpointRef {
   @override
   String get name => 'example';
@@ -39,9 +41,18 @@ class _EndpointTask extends EndpointRef {
   }
 }
 
+class _Modules {
+  late final serverpod_auth.Caller auth;
+
+  _Modules(Client client) {
+    auth = serverpod_auth.Caller(client);
+  }
+}
+
 class Client extends ServerpodClient {
   late final _EndpointExample example;
   late final _EndpointTask task;
+  late final _Modules modules;
 
   Client(String host,
       {SecurityContext? context,
@@ -53,6 +64,9 @@ class Client extends ServerpodClient {
             authenticationKeyManager: authenticationKeyManager) {
     example = _EndpointExample(this);
     task = _EndpointTask(this);
+
+    modules = _Modules(this);
+    registerModuleProtocol(serverpod_auth.Protocol());
   }
 
   @override
@@ -62,5 +76,7 @@ class Client extends ServerpodClient {
       };
 
   @override
-  Map<String, ModuleEndpointCaller> get moduleLookup => {};
+  Map<String, ModuleEndpointCaller> get moduleLookup => {
+        'auth': modules.auth,
+      };
 }

@@ -11,12 +11,14 @@ import 'package:serverpod/serverpod.dart';
 import 'protocol.dart';
 
 import '../endpoints/example_endpoint.dart';
+import '../endpoints/task_endpoint.dart';
 
 class Endpoints extends EndpointDispatch {
   @override
   void initializeEndpoints(Server server) {
     var endpoints = <String, Endpoint>{
       'example': ExampleEndpoint()..initialize(server, 'example', null),
+      'task': TaskEndpoint()..initialize(server, 'task', null),
     };
 
     connectors['example'] = EndpointConnector(
@@ -33,6 +35,26 @@ class Endpoints extends EndpointDispatch {
             return (endpoints['example'] as ExampleEndpoint).hello(
               session,
               params['name'],
+            );
+          },
+        ),
+      },
+    );
+
+    connectors['task'] = EndpointConnector(
+      name: 'task',
+      endpoint: endpoints['task']!,
+      methodConnectors: {
+        'addTask': MethodConnector(
+          name: 'addTask',
+          params: {
+            'task':
+                ParameterDescription(name: 'task', type: Task, nullable: false),
+          },
+          call: (Session session, Map<String, dynamic> params) async {
+            return (endpoints['task'] as TaskEndpoint).addTask(
+              session,
+              params['task'],
             );
           },
         ),

@@ -11,8 +11,10 @@ import 'dart:typed_data';
 import 'package:serverpod/serverpod.dart';
 
 import 'example_class.dart';
+import 'task_class.dart';
 
 export 'example_class.dart';
+export 'task_class.dart';
 
 class Protocol extends SerializationManagerServer {
   static final Protocol instance = Protocol();
@@ -32,5 +34,10 @@ class Protocol extends SerializationManagerServer {
   Protocol() {
     constructors['Example'] = (Map<String, dynamic> serialization) =>
         Example.fromSerialization(serialization);
+    constructors['Task'] = (Map<String, dynamic> serialization) =>
+        Task.fromSerialization(serialization);
+
+    tableClassMapping['task'] = 'Task';
+    typeTableMapping[Task] = Task.t;
   }
 }
